@@ -22,7 +22,7 @@ jobs:
           java-version: "17"
 
       - name: Build with Maven (use dev profile)
-        run: mvn clean install -Dspring.profiles.active=dev -DskipTests
+        run: mvn clean package "-Dspring.profiles.active=dev" -DskipTests
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
