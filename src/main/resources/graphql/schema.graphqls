@@ -1,0 +1,19 @@
+type MealEvent {
+    id: String!
+    title: String!
+    name: String!
+    start: String!
+    userId: String!
+}
+
+type Query {
+    getMealEventById(id: String!): MealEvent
+    getMealEventByUserId(userId: String!): [MealEvent]
+}
+
+
+type Mutation {
+  createMealEvent(title: String!, name: String!, start: String!, userId: String!): MealEvent
+  updateMealEvent(id: String!, title: String, name: String, start: String, userId: String): MealEvent
+  deleteMealEvent(id: String!): String
+}
