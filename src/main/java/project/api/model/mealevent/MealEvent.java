@@ -1,4 +1,4 @@
-package project.api.model;
+package project.api.model.mealevent;
 
 import org.springframework.data.annotation.Id;
 

@@ -1,9 +1,12 @@
 package project.api.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Service;
 
-import project.api.model.MealEvent;
+import project.api.model.mealevent.MealEvent;
+import project.api.model.mealevent.UpdateMealEventInput;
 import project.api.repository.MealEventRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,15 +29,19 @@ public class MealEventService {
         return mealEventRepository.save(mealEvent);
     }
 
-    public Mono<MealEvent> updateMealEvent(String id, String title, String name, String start, String userId) {
+    @MutationMapping
+    public Mono<MealEvent> updateMealEvent(@Argument String id, @Argument UpdateMealEventInput input) {
         return mealEventRepository.findById(id)
-                .flatMap(existingMealEvent -> {
-                    existingMealEvent.setTitle(title != null ? title : existingMealEvent.getTitle());
-                    existingMealEvent.setName(name != null ? name : existingMealEvent.getName());
-                    existingMealEvent.setStart(start != null ? start : existingMealEvent.getStart());
-                    existingMealEvent.setUserId(userId != null ? userId : existingMealEvent.getUserId());
-
-                    return mealEventRepository.save(existingMealEvent);
+                .flatMap(existing -> {
+                    if (input.getTitle() != null)
+                        existing.setTitle(input.getTitle());
+                    if (input.getName() != null)
+                        existing.setName(input.getName());
+                    if (input.getStart() != null)
+                        existing.setStart(input.getStart());
+                    if (input.getUserId() != null)
+                        existing.setUserId(input.getUserId());
+                    return mealEventRepository.save(existing);
                 });
     }
 

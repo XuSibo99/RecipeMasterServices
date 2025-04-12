@@ -1,19 +1,32 @@
+input MealEventInput {
+  title: String!
+  name: String!
+  start: String!
+  userId: String!
+}
+
+input UpdateMealEventInput {
+  title: String
+  name: String
+  start: String
+  userId: String
+}
+
 type MealEvent {
-    id: String!
-    title: String!
-    name: String!
-    start: String!
-    userId: String!
+  id: String!
+  title: String!
+  name: String!
+  start: String!
+  userId: String!
 }
 
 type Query {
-    getMealEventById(id: String!): MealEvent
-    getMealEventByUserId(userId: String!): [MealEvent]
+  getMealEventById(id: String!): MealEvent
+  getMealEventByUserId(userId: String!): [MealEvent]
 }
 
-
 type Mutation {
-  createMealEvent(title: String!, name: String!, start: String!, userId: String!): MealEvent
-  updateMealEvent(id: String!, title: String, name: String, start: String, userId: String): MealEvent
+  createMealEvent(input: MealEventInput!): MealEvent
+  updateMealEvent(id: String!, input: UpdateMealEventInput!): MealEvent
   deleteMealEvent(id: String!): String
 }

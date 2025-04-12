@@ -6,7 +6,9 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
-import project.api.model.MealEvent;
+import project.api.model.mealevent.MealEvent;
+import project.api.model.mealevent.UpdateMealEventInput;
+import project.api.model.mealevent.CreateMealEventInput;
 import project.api.service.MealEventService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,17 +30,18 @@ public class MealEventResolver {
     }
 
     @MutationMapping
-    public Mono<MealEvent> createMealEvent(@Argument String title, @Argument String name,
-            @Argument String start, @Argument String userId) {
-        MealEvent newMealEvent = new MealEvent(title, name, start, userId);
+    public Mono<MealEvent> createMealEvent(@Argument CreateMealEventInput input) {
+        MealEvent newMealEvent = new MealEvent(
+                input.getTitle(),
+                input.getName(),
+                input.getStart(),
+                input.getUserId());
         return mealEventService.createMealEvent(newMealEvent);
     }
 
     @MutationMapping
-    public Mono<MealEvent> updateMealEvent(@Argument String id, @Argument String title,
-            @Argument String name, @Argument String start,
-            @Argument String userId) {
-        return mealEventService.updateMealEvent(id, title, name, start, userId);
+    public Mono<MealEvent> updateMealEvent(@Argument String id, @Argument UpdateMealEventInput input) {
+        return mealEventService.updateMealEvent(id, input);
     }
 
     @MutationMapping
