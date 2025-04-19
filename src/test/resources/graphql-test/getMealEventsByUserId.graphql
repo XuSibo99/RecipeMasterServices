@@ -1,0 +1,7 @@
+query getMealEventsByUserId($userId: String!) {
+  getMealEventsByUserId(userId: $userId) {
+    id
+    title
+    name
+  }
+}

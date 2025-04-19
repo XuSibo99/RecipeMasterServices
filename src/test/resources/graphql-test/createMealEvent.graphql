@@ -1,0 +1,8 @@
+mutation createMealEvent($input: MealEventInput!) {
+  createMealEvent(input: $input) {
+    title
+    name
+    start
+    userId
+  }
+}

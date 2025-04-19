@@ -1,0 +1,3 @@
+mutation deleteMealEvent($id: String!) {
+  deleteMealEvent(id: $id)
+}

@@ -1,0 +1,9 @@
+mutation updateMealEvent($id: String!, $input: UpdateMealEventInput!) {
+  updateMealEvent(id: $id, input: $input) {
+    id
+    title
+    name
+    start
+    userId
+  }
+}

@@ -25,8 +25,8 @@ public class MealEventResolver {
     }
 
     @QueryMapping
-    public Flux<MealEvent> getMealEventByUserId(@Argument String userId) {
-        return mealEventService.getMealEventByUserId(userId);
+    public Flux<MealEvent> getMealEventsByUserId(@Argument String userId) {
+        return mealEventService.getMealEventsByUserId(userId);
     }
 
     @MutationMapping

@@ -21,7 +21,7 @@ public class MealEventService {
         return mealEventRepository.findById(id);
     }
 
-    public Flux<MealEvent> getMealEventByUserId(String userId) {
+    public Flux<MealEvent> getMealEventsByUserId(String userId) {
         return mealEventRepository.findByUserId(userId);
     }
 
