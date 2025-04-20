@@ -36,6 +36,7 @@ public class MealEventResolver {
                 input.getName(),
                 input.getStart(),
                 input.getUserId());
+        newMealEvent.setRecurrence(input.getRecurrence());
         return mealEventService.createMealEvent(newMealEvent);
     }
 

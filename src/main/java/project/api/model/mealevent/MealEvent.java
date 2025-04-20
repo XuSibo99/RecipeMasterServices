@@ -30,6 +30,9 @@ public class MealEvent {
     @PartitionKey
     private String userId;
 
+    // how often the event recurrent
+    private String recurrence;
+
     // Constructors
     public MealEvent() {
     }
@@ -39,6 +42,14 @@ public class MealEvent {
         this.name = name;
         this.start = start;
         this.userId = userId;
+    }
+
+    public MealEvent(String title, String name, String start, String userId, String recurrence) {
+        this.title = title;
+        this.name = name;
+        this.start = start;
+        this.userId = userId;
+        this.recurrence = recurrence;
     }
 
     // Getters & Setters
@@ -80,5 +91,13 @@ public class MealEvent {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getRecurrence() {
+        return recurrence;
+    }
+
+    public void setRecurrence(String recurrence) {
+        this.recurrence = recurrence;
     }
 }

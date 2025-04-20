@@ -3,5 +3,8 @@ query getMealEventsByUserId($userId: String!) {
     id
     title
     name
+    start
+    userId
+    recurrence
   }
 }

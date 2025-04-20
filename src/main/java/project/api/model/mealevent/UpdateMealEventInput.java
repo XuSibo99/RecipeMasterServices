@@ -8,4 +8,5 @@ public class UpdateMealEventInput {
     private String name;
     private String start;
     private String userId;
+    private String recurrence;
 }

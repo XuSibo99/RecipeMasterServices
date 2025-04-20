@@ -41,6 +41,8 @@ public class MealEventService {
                         existing.setStart(input.getStart());
                     if (input.getUserId() != null)
                         existing.setUserId(input.getUserId());
+                    if (input.getRecurrence() != null)
+                        existing.setRecurrence(input.getRecurrence());
                     return mealEventRepository.save(existing);
                 });
     }

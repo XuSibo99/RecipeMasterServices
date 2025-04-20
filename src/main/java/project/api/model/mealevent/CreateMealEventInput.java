@@ -8,4 +8,5 @@ public class CreateMealEventInput {
     private String name;
     private String start;
     private String userId;
+    private String recurrence;
 }

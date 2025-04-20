@@ -4,5 +4,6 @@ mutation createMealEvent($input: MealEventInput!) {
     name
     start
     userId
+    recurrence
   }
 }
