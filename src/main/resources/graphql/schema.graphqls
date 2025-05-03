@@ -39,4 +39,5 @@ type Mutation {
   createMealEvent(input: MealEventInput!): MealEvent
   updateMealEvent(id: String!, input: UpdateMealEventInput!): MealEvent
   deleteMealEvent(id: String!): String
+  generateAiMealSuggestion(prompt: String!): String
 }

@@ -1,0 +1,3 @@
+mutation generateAiMealSuggestion($prompt: String!) {
+  generateAiMealSuggestion(prompt: $prompt)
+}
