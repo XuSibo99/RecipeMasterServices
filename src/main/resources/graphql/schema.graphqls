@@ -5,6 +5,12 @@ enum Recurrence {
   YEARLY
 }
 
+enum DietaryRestriction {
+  VEGETARIAN
+  GLUTEN_FREE
+  NUT_ALLERGY
+}
+
 input MealEventInput {
   title: String!
   name: String!
@@ -39,5 +45,8 @@ type Mutation {
   createMealEvent(input: MealEventInput!): MealEvent
   updateMealEvent(id: String!, input: UpdateMealEventInput!): MealEvent
   deleteMealEvent(id: String!): String
-  generateAiMealSuggestion(prompt: String!): String
+  generateAiMealSuggestion(
+    prompt: String!
+    restrictions: [DietaryRestriction!]!
+  ): String
 }
