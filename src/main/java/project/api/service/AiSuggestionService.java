@@ -30,12 +30,17 @@ public class AiSuggestionService {
                 String prefText = restrictions.stream()
                                 .map(r -> r.name().toLowerCase().replace('_', ' '))
                                 .collect(Collectors.joining(", "));
-                String systemMsg = "The user’s dietary restrictions are: " + prefText + ".";
+                String systemDietMsg = "The user’s dietary restrictions are: " + prefText + ".";
+
+                String systemFormatMsg = "When you reply, output *only* a JSON array of strings, e.g. " +
+                                "[\"Grilled chicken...\",\"Zucchini noodles...\",...]. " +
+                                "Do not include any prose, numbering, or bullets.";
 
                 Map<String, Object> body = Map.of(
                                 "model", "gpt-3.5-turbo",
                                 "messages", List.of(
-                                                Map.of("role", "system", "content", systemMsg),
+                                                Map.of("role", "system", "content", systemDietMsg),
+                                                Map.of("role", "system", "content", systemFormatMsg),
                                                 Map.of("role", "user", "content", prompt)));
 
                 return client.post()
