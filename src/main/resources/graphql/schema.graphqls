@@ -36,9 +36,33 @@ type MealEvent {
   recurrence: Recurrence
 }
 
+type RecipeBrief {
+  id: ID!
+  title: String!
+  image: String!
+  readyInMinutes: Int
+}
+
+type RecipeFull {
+  id: ID!
+  title: String!
+  image: String!
+  readyInMinutes: Int
+  servings: Int
+  summary: String
+  sourceUrl: String
+  extendedIngredients: [String!]!
+}
+
 type Query {
   getMealEventById(id: String!): MealEvent
   getMealEventsByUserId(userId: String!): [MealEvent]
+  getRecipe(id: ID!): RecipeFull
+  searchRecipes(
+    query: String!
+    restrictions: [DietaryRestriction!]
+    number: Int = 10
+  ): [RecipeBrief!]!
 }
 
 type Mutation {
