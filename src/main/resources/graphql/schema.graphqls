@@ -36,11 +36,15 @@ type MealEvent {
   recurrence: Recurrence
 }
 
-type RecipeBrief {
+type RecipeSummary {
   id: ID!
   title: String!
   image: String!
   readyInMinutes: Int
+  servings: Int
+  sourceUrl: String
+  spoonacularSourceUrl: String
+  calories: Float
 }
 
 type RecipeFull {
@@ -62,7 +66,7 @@ type Query {
     query: String!
     restrictions: [DietaryRestriction!]
     number: Int = 10
-  ): [RecipeBrief!]!
+  ): [RecipeSummary!]!
 }
 
 type Mutation {
