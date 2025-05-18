@@ -40,22 +40,57 @@ type RecipeSummary {
   id: ID!
   title: String!
   image: String!
-  readyInMinutes: Int
-  servings: Int
   sourceUrl: String
   spoonacularSourceUrl: String
-  calories: Float
 }
 
 type RecipeFull {
   id: ID!
   title: String!
   image: String!
+  sourceUrl: String
+  spoonacularSourceUrl: String
+
+  healthScore: Int
+  calories: Float
+  dishTypes: [String!]!
+  cuisines: [String!]!
   readyInMinutes: Int
   servings: Int
+  vegetarian: Boolean!
+  vegan: Boolean!
+  glutenFree: Boolean!
+  dairyFree: Boolean!
   summary: String
-  sourceUrl: String
-  extendedIngredients: [String!]!
+  instructions: String
+  analyzedInstructions: [Instruction!]!
+  nutrition: Nutrition
+}
+
+type Instruction {
+  step: String!
+  ingredients: [IngredientRef!]!
+  equipment: [EquipmentRef!]!
+}
+
+type IngredientRef {
+  id: ID!
+  name: String!
+}
+
+type EquipmentRef {
+  id: ID!
+  name: String!
+}
+
+type Nutrition {
+  nutrients: [Nutrient!]!
+}
+
+type Nutrient {
+  name: String!
+  amount: Float!
+  unit: String!
 }
 
 type Query {

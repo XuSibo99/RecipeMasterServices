@@ -1,8 +1,8 @@
 package project.api.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,24 +55,13 @@ public class SpoonacularClientService {
                 .bodyToMono(ComplexSearchResponse.class)
                 .block();
 
-        return response.getResults().stream()
-                .map(r -> {
-                    double calories = r.getNutrition().getNutrients().stream()
-                            .filter(n -> "Calories".equalsIgnoreCase(n.getName()))
-                            .findFirst()
-                            .map(Nutrient::getAmount)
-                            .orElse(0.0);
-
-                    return new RecipeSummary(
-                            r.getId(),
-                            r.getTitle(),
-                            r.getImage(),
-                            r.getReadyInMinutes(),
-                            r.getServings(),
-                            r.getSourceUrl(),
-                            r.getSpoonacularSourceUrl(),
-                            calories);
-                })
+        return response.results().stream()
+                .map(r -> new RecipeSummary(
+                        r.id(),
+                        r.title(),
+                        r.image(),
+                        r.sourceUrl(),
+                        r.spoonacularSourceUrl()))
                 .collect(Collectors.toList());
     }
 
@@ -81,7 +70,7 @@ public class SpoonacularClientService {
                 .uri(uriBuilder -> uriBuilder
                         .path("/recipes/{id}/information")
                         .queryParam("apiKey", spoonacularApiKey)
-                        .queryParam("includeNutrition", false)
+                        .queryParam("includeNutrition", true)
                         .build(id))
                 .retrieve()
                 .bodyToMono(RecipeInfoResponse.class)
@@ -91,236 +80,101 @@ public class SpoonacularClientService {
             throw new RuntimeException("Failed to fetch recipe info for id " + id);
         }
 
-        List<String> ingredients = info.getExtendedIngredients().stream()
-                .map(RecipeInfoResponse.Ingredient::getOriginalString)
-                .filter(Objects::nonNull) // drop nulls
-                .filter(s -> !s.isBlank()) // (optional) drop empty strings
+        double calories = info.nutrition().nutrients().stream()
+                .filter(n -> "Calories".equalsIgnoreCase(n.name()))
+                .findFirst()
+                .map(n -> n.amount())
+                .orElse(0.0);
+
+        List<RecipeFull.Instruction> steps = info.analyzedInstructions().stream()
+                .map(step -> new RecipeFull.Instruction(
+                        step.step(),
+                        step.ingredients().stream()
+                                .map(i -> new RecipeFull.IngredientRef(i.id().toString(), i.name()))
+                                .collect(Collectors.toList()),
+                        step.equipment().stream()
+                                .map(e -> new RecipeFull.EquipmentRef(e.id().toString(), e.name()))
+                                .collect(Collectors.toList())))
                 .collect(Collectors.toList());
 
         return new RecipeFull(
-                info.getId(),
-                info.getTitle(),
-                info.getImage(),
-                info.getReadyInMinutes(),
-                info.getServings(),
-                info.getSummary(),
-                info.getSourceUrl(),
-                ingredients);
+                info.id(),
+                info.title(),
+                info.image(),
+                info.sourceUrl(),
+                info.spoonacularSourceUrl(),
+                info.healthScore(),
+                calories,
+                info.dishTypes(),
+                info.cuisines(),
+                info.readyInMinutes(),
+                info.servings(),
+                info.vegetarian(),
+                info.vegan(),
+                info.glutenFree(),
+                info.dairyFree(),
+                info.summary(),
+                info.instructions(),
+                steps,
+                new RecipeFull.Nutrition(
+                        info.nutrition().nutrients().stream()
+                                .map(n -> new RecipeFull.Nutrient(n.name(), n.amount(), n.unit()))
+                                .collect(Collectors.toList())));
     }
 
-    public static class ComplexSearchResponse {
-        private List<SearchResult> results;
-
-        public List<SearchResult> getResults() {
-            return results;
-        }
-
-        public void setResults(List<SearchResult> results) {
-            this.results = results;
-        }
+    public record ComplexSearchResponse(List<SearchResult> results) {
     }
 
-    public static class SearchResult {
-        private Long id;
-        private String title;
-        private String image;
-        private Integer readyInMinutes;
-        private Integer servings;
-        private String sourceUrl;
-        private Nutrition nutrition;
-        private String spoonacularSourceUrl;
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getImage() {
-            return image;
-        }
-
-        public void setImage(String image) {
-            this.image = image;
-        }
-
-        public Integer getReadyInMinutes() {
-            return readyInMinutes;
-        }
-
-        public void setReadyInMinutes(Integer readyInMinutes) {
-            this.readyInMinutes = readyInMinutes;
-        }
-
-        public Integer getServings() {
-            return servings;
-        }
-
-        public void setServings(Integer servings) {
-            this.servings = servings;
-        }
-
-        public String getSourceUrl() {
-            return sourceUrl;
-        }
-
-        public void setSourceUrl(String sourceUrl) {
-            this.sourceUrl = sourceUrl;
-        }
-
-        public Nutrition getNutrition() {
-            return nutrition;
-        }
-
-        public void setNutrition(Nutrition nutrition) {
-            this.nutrition = nutrition;
-        }
-
-        public String getSpoonacularSourceUrl() {
-            return spoonacularSourceUrl;
-        }
-
-        public void setSpoonacularSourceUrl(String u) {
-            this.spoonacularSourceUrl = u;
-        }
+    public record SearchResult(
+            Long id,
+            String title,
+            String image,
+            Integer readyInMinutes,
+            Integer servings,
+            String sourceUrl,
+            String spoonacularSourceUrl,
+            Nutrition nutrition) {
     }
 
-    public static class Nutrition {
-        private List<Nutrient> nutrients;
-
-        public List<Nutrient> getNutrients() {
-            return nutrients;
-        }
-
-        public void setNutrients(List<Nutrient> nutrients) {
-            this.nutrients = nutrients;
-        }
+    public record Nutrition(List<Nutrient> nutrients) {
     }
 
-    public static class Nutrient {
-        private String name;
-        private Double amount;
-        private String unit;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public Double getAmount() {
-            return amount;
-        }
-
-        public void setAmount(Double amount) {
-            this.amount = amount;
-        }
-
-        public String getUnit() {
-            return unit;
-        }
-
-        public void setUnit(String unit) {
-            this.unit = unit;
-        }
+    public record Nutrient(String name, Double amount, String unit) {
     }
 
-    public static class RecipeInfoResponse {
-        private Long id;
-        private String title;
-        private String image;
-        private String summary;
-        private String sourceUrl;
-        private Integer readyInMinutes;
-        private Integer servings;
-        private List<Ingredient> extendedIngredients;
-
-        public Long getId() {
-            return id;
+    public record RecipeInfoResponse(
+            Long id,
+            String title,
+            String image,
+            String sourceUrl,
+            String spoonacularSourceUrl,
+            Integer healthScore,
+            List<String> dishTypes,
+            List<String> cuisines,
+            Integer readyInMinutes,
+            Integer servings,
+            Boolean vegetarian,
+            Boolean vegan,
+            Boolean glutenFree,
+            Boolean dairyFree,
+            String summary,
+            String instructions,
+            List<InstructionStep> analyzedInstructions,
+            Nutrition nutrition) {
+        public record InstructionStep(
+                String step,
+                List<Ingredient> ingredients,
+                List<Equipment> equipment) {
         }
 
-        public void setId(Long id) {
-            this.id = id;
+        public record Ingredient(
+                Long id,
+                String name) {
         }
 
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getImage() {
-            return image;
-        }
-
-        public void setImage(String image) {
-            this.image = image;
-        }
-
-        public String getSummary() {
-            return summary;
-        }
-
-        public void setSummary(String summary) {
-            this.summary = summary;
-        }
-
-        public String getSourceUrl() {
-            return sourceUrl;
-        }
-
-        public void setSourceUrl(String sourceUrl) {
-            this.sourceUrl = sourceUrl;
-        }
-
-        public Integer getReadyInMinutes() {
-            return readyInMinutes;
-        }
-
-        public void setReadyInMinutes(Integer readyInMinutes) {
-            this.readyInMinutes = readyInMinutes;
-        }
-
-        public Integer getServings() {
-            return servings;
-        }
-
-        public void setServings(Integer servings) {
-            this.servings = servings;
-        }
-
-        public List<Ingredient> getExtendedIngredients() {
-            return extendedIngredients;
-        }
-
-        public void setExtendedIngredients(List<Ingredient> extendedIngredients) {
-            this.extendedIngredients = extendedIngredients;
-        }
-
-        public static class Ingredient {
-            private String originalString;
-
-            public String getOriginalString() {
-                return originalString;
-            }
-
-            public void setOriginalString(String originalString) {
-                this.originalString = originalString;
-            }
+        public record Equipment(
+                Long id,
+                String name) {
         }
     }
 }
