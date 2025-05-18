@@ -1,6 +1,7 @@
 package project.api.graphql;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -45,5 +46,17 @@ public class AiMealSuggestionResolver {
     @QueryMapping
     public RecipeFull getRecipe(@Argument Long id) {
         return spoonacularClientService.getRecipe(id);
+    }
+
+    @QueryMapping
+    public List<RecipeSummary> searchRecipesByTitles(
+            @Argument List<String> titles,
+            @Argument List<DietaryRestriction> restrictions) {
+        return titles.stream()
+                .flatMap(title -> spoonacularClientService
+                        .searchRecipes(title, restrictions, 1)
+                        .stream()
+                        .limit(1))
+                .collect(Collectors.toList());
     }
 }

@@ -67,6 +67,10 @@ type Query {
     restrictions: [DietaryRestriction!]
     number: Int = 10
   ): [RecipeSummary!]!
+  searchRecipesByTitles(
+    titles: [String!]!
+    restrictions: [DietaryRestriction!]
+  ): [RecipeSummary!]!
 }
 
 type Mutation {

@@ -2,6 +2,7 @@ package project.api.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -90,6 +91,12 @@ public class SpoonacularClientService {
             throw new RuntimeException("Failed to fetch recipe info for id " + id);
         }
 
+        List<String> ingredients = info.getExtendedIngredients().stream()
+                .map(RecipeInfoResponse.Ingredient::getOriginalString)
+                .filter(Objects::nonNull) // drop nulls
+                .filter(s -> !s.isBlank()) // (optional) drop empty strings
+                .collect(Collectors.toList());
+
         return new RecipeFull(
                 info.getId(),
                 info.getTitle(),
@@ -98,9 +105,7 @@ public class SpoonacularClientService {
                 info.getServings(),
                 info.getSummary(),
                 info.getSourceUrl(),
-                info.getExtendedIngredients().stream()
-                        .map(RecipeInfoResponse.Ingredient::getOriginalString)
-                        .collect(Collectors.toList()));
+                ingredients);
     }
 
     public static class ComplexSearchResponse {
