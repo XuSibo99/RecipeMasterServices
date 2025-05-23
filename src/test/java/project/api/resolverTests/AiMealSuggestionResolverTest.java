@@ -1,5 +1,7 @@
 package project.api.resolverTests;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.graphql.test.tester.GraphQlTester;
 
 import project.api.graphql.AiMealSuggestionResolver;
+import project.api.model.aisuggestion.DietaryRestriction;
 import project.api.service.AiSuggestionService;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +25,8 @@ public class AiMealSuggestionResolverTest {
 
     @Test
     void generateAiMealSuggestion_returnsResponse() {
-        Mockito.when(aiSuggestionService.generateSuggestion("give me 3 lunch ideas"))
+        Mockito.when(aiSuggestionService.generateSuggestion(Mockito.eq("give me 3 lunch ideas"),
+                Mockito.eq(List.of(DietaryRestriction.VEGETARIAN))))
                 .thenReturn(Mono.just("1. Sandwich\n2. Pasta\n3. Salad"));
 
         graphQlTester.documentName("generateAiMealSuggestion")
